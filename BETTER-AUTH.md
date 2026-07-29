@@ -2,17 +2,17 @@
 
 > **Authentication as a Security and Identity Architecture**
 >
-> Understanding authentication systems, user identity, sessions, security boundaries, and integrating authentication correctly into modern frontend applications.
+> Understanding authentication systems, user identity, sessions, security boundaries, and integrating authentication correctly into modern applications.
 
 ---
 
 # Purpose
 
-This document defines the authentication principles, architecture, and implementation standards used throughout the SENSEI Handbook.
+This document defines the authentication principles, architecture, and standards used throughout the SENSEI Handbook.
 
-Authentication is not simply a login form.
+Authentication is not only a login form.
 
-It is a complete system responsible for:
+It is a system responsible for:
 
 - Identifying users.
 - Managing sessions.
@@ -20,25 +20,24 @@ It is a complete system responsible for:
 - Controlling access.
 - Maintaining security boundaries.
 
-A professional engineer must understand authentication as an architectural concern rather than only a UI feature.
+Professional engineers treat authentication as an architectural concern.
 
 ---
 
 # What Is Authentication?
 
-Authentication is the process of verifying who a user is.
+Authentication verifies the identity of a user.
 
-It answers the question:
+It answers:
 
-> "Are you really who you claim to be?"
+> "Who are you?"
 
 Examples:
 
-- Email and password login.
+- Email and password.
 - Social authentication.
 - Multi-factor authentication.
 - Passwordless authentication.
-- Enterprise identity providers.
 
 Authentication establishes identity.
 
@@ -46,35 +45,59 @@ Authentication establishes identity.
 
 # Authentication vs Authorization
 
-These concepts are related but different.
+These concepts are connected but different.
 
 ## Authentication
 
-Authentication answers:
+Answers:
 
 > Who are you?
 
 Example:
 
-A user successfully logs into an application.
+A user successfully signs into an application.
 
 ---
 
 ## Authorization
 
-Authorization answers:
+Answers:
 
 > What are you allowed to do?
 
 Example:
 
-A user can view their profile but cannot access another user's private data.
+A user can access their own profile but not another user's private information.
+
+---
+
+# Identity Architecture
+
+A complete identity system usually contains:
+
+```text
+Identity
+
+↓
+
+Authentication
+
+↓
+
+Authorization
+```
+
+Meaning:
+
+- Identity represents the user.
+- Authentication verifies the user.
+- Authorization controls permissions.
 
 ---
 
 # Authentication Flow
 
-A typical authentication system follows this flow:
+A typical flow:
 
 ```text
 User
@@ -92,26 +115,25 @@ Identity Provider
 Session Created
  |
  ↓
-User Access Granted
+Access Granted
 ```
 
 The frontend collects information.
 
 The authentication system verifies identity.
 
-The application manages access.
+The application manages permissions.
 
 ---
 
 # Why Authentication Architecture Matters
 
-Poor authentication design creates serious problems:
+Poor authentication design creates:
 
 - Security vulnerabilities.
 - Exposed private data.
-- Broken user experiences.
 - Difficult maintenance.
-- Inconsistent authorization rules.
+- Inconsistent access control.
 
 Authentication should be designed before implementation.
 
@@ -119,18 +141,18 @@ Authentication should be designed before implementation.
 
 # Better Auth Overview
 
-Better Auth is a modern authentication framework designed for TypeScript applications.
+Better Auth is a TypeScript-first authentication framework that provides authentication primitives for modern applications.
 
-It provides solutions for:
+It helps manage:
 
 - User authentication.
 - Sessions.
 - Credentials.
 - Social providers.
 - Database integration.
-- Security management.
+- Security workflows.
 
-It removes the need to build authentication systems completely from scratch.
+It simplifies authentication while allowing engineers to maintain architectural control.
 
 ---
 
@@ -138,7 +160,7 @@ It removes the need to build authentication systems completely from scratch.
 
 ## Never Trust the Client
 
-Frontend applications run in environments controlled by users.
+Frontend applications run in user-controlled environments.
 
 Never assume:
 
@@ -146,211 +168,129 @@ Never assume:
 - Client permissions are correct.
 - Client state is secure.
 
-The server must always verify authorization.
+The server must verify authentication and authorization.
 
 ---
 
-## Sessions Belong to the Server
+## Secure Session Management
 
-A user session represents authenticated identity.
+Sessions represent authenticated identity.
 
-Session management should be handled securely.
+Good session systems handle:
 
-Avoid manually creating insecure authentication systems.
-
----
-
-## Store Minimal Information
-
-Only store necessary information.
-
-Avoid keeping sensitive data unnecessarily.
-
-Good systems minimize exposure.
+- Expiration.
+- Revocation.
+- Secure storage.
+- Validation.
 
 ---
 
-## Security by Default
+## Minimize Stored Data
 
-Authentication systems should include:
+Store only information that is necessary.
 
-- Secure cookies.
-- Session expiration.
-- Input validation.
-- Rate limiting.
-- Proper error handling.
+Reducing sensitive data reduces security risks.
 
 ---
 
 # Authentication Architecture
 
-Recommended architecture:
+Recommended structure:
 
 ```text
 Frontend
-   |
-   ↓
-Authentication Client
-   |
-   ↓
-Better Auth
-   |
-   ↓
+
+↓
+
+Authentication Layer
+
+↓
+
 Database
 ```
 
-The frontend communicates with the authentication layer.
+The frontend interacts with authentication services.
 
 The authentication layer manages identity.
 
 ---
 
-# Frontend Authentication Structure
+# Frontend Authentication Flow
 
-A scalable frontend authentication structure:
-
-```text
-src/
-│
-├── features/
-│   └── auth/
-│       ├── components/
-│       │   ├── LoginForm.tsx
-│       │   └── SignupForm.tsx
-│       │
-│       ├── hooks/
-│       │   └── useAuth.ts
-│       │
-│       ├── services/
-│       │   └── auth.service.ts
-│       │
-│       └── types/
-│           └── auth.ts
-```
-
-Authentication should be isolated as a feature.
-
----
-
-# Login Flow
-
-A typical login process:
+Example:
 
 ```text
-User enters credentials
-          |
-          ↓
 Login Component
-          |
-          ↓
+
+↓
+
 Auth Hook
-          |
-          ↓
+
+↓
+
 Auth Service
-          |
-          ↓
+
+↓
+
 Better Auth
-          |
-          ↓
-Session Created
-          |
-          ↓
-User Redirected
+
+↓
+
+Session
+
+↓
+
+Protected Application
 ```
 
 Each layer has a clear responsibility.
 
 ---
 
-# Signup Flow
-
-Signup usually includes:
-
-1. Collect user information.
-2. Validate input.
-3. Send request.
-4. Create account.
-5. Establish session.
-6. Redirect user.
-
-Validation should happen on both:
-
-- Frontend.
-- Backend.
-
----
-
-# Session Management
-
-Sessions allow applications to remember authenticated users.
-
-A session usually contains:
-
-- User identity.
-- Session identifier.
-- Expiration information.
-
-Good session systems handle:
-
-- Expiration.
-- Refreshing.
-- Revocation.
-- Security.
-
----
-
 # Protected Routes
 
-Private pages should verify authentication.
+Private resources must verify authentication.
 
 Example:
 
 ```text
-Public Routes
+Public:
 
-/
- /login
- /signup
+/login
+/signup
 
 
-Protected Routes
+Protected:
 
 /dashboard
 /settings
 /profile
 ```
 
-Protected routes should never rely only on frontend checks.
+Frontend route protection improves experience.
+
+Backend authorization provides security.
 
 ---
 
 # Authentication State
 
-Frontend applications need to know:
+Applications need to know:
 
-- Is the user logged in?
-- Who is the user?
-- Is authentication loading?
-- Has authentication failed?
+- Current user.
+- Authentication status.
+- Loading state.
+- Authentication errors.
 
 Authentication state should be centralized.
 
-Avoid duplicating authentication logic across components.
+Avoid duplicating authentication logic.
 
 ---
 
 # Error Handling
 
-Authentication errors should be handled carefully.
-
-Examples:
-
-- Invalid credentials.
-- Expired session.
-- Network failure.
-- Account problems.
-
-Avoid exposing sensitive information.
+Authentication errors should avoid exposing sensitive information.
 
 Bad:
 
@@ -366,53 +306,28 @@ Invalid email or password.
 
 ---
 
-# Security Considerations
+# Security Checklist
 
-Authentication systems should consider:
+Authentication systems should include:
 
-## Password Security
-
-Never:
-
-- Store plain passwords.
-- Log sensitive information.
-- Expose credentials.
-
----
-
-## Session Security
-
-Consider:
-
-- Expiration.
-- Revocation.
-- Secure storage.
-- Cookie protection.
+- Secure sessions.
+- Input validation.
+- Protected resources.
+- Proper error handling.
+- Authorization rules.
+- Sensitive data protection.
 
 ---
 
-## Input Validation
-
-Validate:
-
-- Email format.
-- Password requirements.
-- User input.
-
-Never trust incoming data.
-
----
-
-# Common Authentication Mistakes
+# Common Mistakes
 
 Avoid:
 
-- Storing sensitive tokens insecurely.
-- Checking authorization only on the frontend.
-- Duplicating authentication logic.
+- Trusting frontend authorization.
+- Storing sensitive data insecurely.
 - Building custom authentication unnecessarily.
 - Ignoring session expiration.
-- Returning detailed authentication errors.
+- Duplicating authentication logic.
 
 ---
 
@@ -423,13 +338,11 @@ Recommended relationship:
 ```text
 Next.js Application
 
-        |
-        ↓
+↓
 
-Authentication Layer
+Better Auth
 
-        |
-        ↓
+↓
 
 Database
 ```
@@ -444,14 +357,13 @@ Keep responsibilities separated.
 
 # Authentication Checklist
 
-Before releasing authentication:
+Before release:
 
 - Users can register securely.
-- Users can log in.
+- Users can authenticate.
 - Sessions work correctly.
-- Protected routes are protected.
-- Errors are handled.
-- Sensitive information is protected.
+- Protected routes are secured.
+- Errors are handled safely.
 - Authorization rules exist.
 - Documentation is complete.
 
@@ -463,9 +375,9 @@ Authentication is one of the most important systems in any application.
 
 A login page is only the visible part.
 
-Professional authentication requires understanding identity, sessions, security boundaries, and authorization.
+Professional authentication requires understanding identity, sessions, authorization, and security boundaries.
 
-Better Auth should be treated as an architectural tool that simplifies secure authentication—not as a shortcut that removes the need for understanding.
+Better Auth should be treated as an architectural tool that simplifies secure authentication—not as a replacement for engineering understanding.
 
 ---
 
