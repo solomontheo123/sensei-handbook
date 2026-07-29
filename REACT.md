@@ -10,9 +10,7 @@
 
 This document establishes the React philosophy, architectural patterns, and engineering standards followed throughout the SENSEI Handbook.
 
-The objective is not merely to learn React APIs.
-
-The objective is to understand React's mental model so that complex applications remain maintainable as they grow.
+The goal is not only to learn React APIs, but to understand React's mental model so applications remain maintainable as they grow.
 
 ---
 
@@ -20,39 +18,39 @@ The objective is to understand React's mental model so that complex applications
 
 React is a declarative JavaScript library for building user interfaces.
 
-Instead of manually updating the DOM, engineers describe what the interface should look like for a given state.
+Instead of manually updating the DOM, engineers describe what the interface should look like based on application state.
 
-React updates the UI whenever that state changes.
+When state changes, React updates the interface automatically.
 
-This approach simplifies complex applications by making UI a predictable function of application state.
+This creates predictable and maintainable user experiences.
 
 ---
 
 # Why React Exists
 
-Traditional DOM manipulation quickly becomes difficult to maintain.
+Traditional DOM manipulation becomes difficult as applications grow.
 
-React solves this by introducing:
+React solves this through:
 
 - Component-based architecture
 - Declarative rendering
 - State-driven interfaces
-- Efficient updates through the Virtual DOM
-- Reusable UI
+- Efficient UI updates
+- Reusable components
 
-React enables developers to focus on describing interfaces rather than manually synchronizing them.
+React allows engineers to focus on describing interfaces instead of manually synchronizing them.
 
 ---
 
 # The React Mental Model
 
-Everything in React revolves around one simple idea:
+Everything in React revolves around:
 
 > **UI = f(State)**
 
-The user interface is a function of the current application state.
+The interface is a function of application state.
 
-When state changes, React determines the minimum updates required to keep the interface synchronized.
+When state changes, React determines the necessary updates.
 
 Think in data flow—not DOM manipulation.
 
@@ -69,10 +67,10 @@ Each component should:
 - Solve one responsibility.
 - Be reusable.
 - Be understandable.
-- Accept well-defined inputs.
+- Accept clear inputs.
 - Produce predictable outputs.
 
-Large components should be divided into smaller ones.
+Large components should be divided into smaller focused components.
 
 ---
 
@@ -91,13 +89,13 @@ Dashboard
 └── Footer
 ```
 
-Applications become scalable by combining simple components.
+Complex applications are created by combining simple components.
 
 ---
 
 ## Props
 
-Props allow data to flow from parent to child.
+Props allow data flow from parent to child.
 
 Props should be:
 
@@ -117,13 +115,11 @@ Use state only when data affects rendering.
 
 Avoid storing derived values inside state.
 
-Compute them instead.
-
 ---
 
 ## One-Way Data Flow
 
-Data flows downward.
+React follows predictable data movement:
 
 ```text
 Parent
@@ -135,19 +131,17 @@ Child
 Grandchild
 ```
 
-Predictable data flow makes applications easier to debug.
+One-way flow improves debugging and maintainability.
 
 ---
 
 # Rendering
 
-React automatically re-renders components whenever their state or props change.
+React re-renders components when state or props change.
 
 Re-rendering is normal.
 
-Avoid premature optimization.
-
-Optimize only after identifying real bottlenecks.
+Optimize only after identifying real performance problems.
 
 ---
 
@@ -155,7 +149,7 @@ Optimize only after identifying real bottlenecks.
 
 Hooks allow components to use React features without classes.
 
-Common hooks include:
+Common hooks:
 
 - useState
 - useEffect
@@ -164,15 +158,15 @@ Common hooks include:
 - useRef
 - useContext
 
-Use hooks to organize logic—not to increase complexity.
+Use hooks to organize logic, not create unnecessary complexity.
 
 ---
 
 # Custom Hooks
 
-Extract reusable logic into custom hooks.
+Reusable behavior should be extracted into custom hooks.
 
-Example:
+Examples:
 
 ```text
 useAuth()
@@ -181,7 +175,7 @@ useTheme()
 useWindowSize()
 ```
 
-Custom hooks should encapsulate behavior rather than UI.
+Custom hooks should contain logic, not UI.
 
 ---
 
@@ -213,11 +207,9 @@ Side effects include:
 - Subscriptions
 - Browser APIs
 
-Keep side effects isolated.
+Keep effects isolated.
 
-Avoid unnecessary effects.
-
-Whenever possible, derive values instead of synchronizing them.
+Prefer deriving values instead of unnecessary synchronization.
 
 ---
 
@@ -227,21 +219,19 @@ Forms should:
 
 - Validate input.
 - Handle loading states.
-- Display helpful errors.
+- Display errors.
 - Remain accessible.
 - Prevent duplicate submissions.
 
-React manages UI.
-
-Validation manages correctness.
+React manages interface behavior; validation ensures correctness.
 
 ---
 
 # Performance
 
-Optimize only when measurements justify it.
+Optimize based on measurements.
 
-Useful techniques include:
+Useful techniques:
 
 - Memoization
 - Lazy loading
@@ -249,13 +239,13 @@ Useful techniques include:
 - Stable keys
 - Avoiding unnecessary renders
 
-Do not sacrifice readability for insignificant performance gains.
+Never sacrifice readability for minor gains.
 
 ---
 
 # Accessibility
 
-Every React application should support:
+React applications should support:
 
 - Semantic HTML
 - Keyboard navigation
@@ -263,7 +253,7 @@ Every React application should support:
 - Focus management
 - Accessible labels
 
-Accessibility is a requirement—not an enhancement.
+Accessibility is a requirement.
 
 ---
 
@@ -271,13 +261,12 @@ Accessibility is a requirement—not an enhancement.
 
 Avoid:
 
-- Massive components
-- Prop drilling without reason
-- Excessive Context usage
-- Business logic inside UI
-- Unnecessary effects
-- Mutating state directly
-- Ignoring component responsibilities
+- Massive components.
+- Excessive Context usage.
+- Business logic inside UI.
+- Unnecessary effects.
+- Direct state mutation.
+- Poor component boundaries.
 
 ---
 
@@ -285,11 +274,10 @@ Avoid:
 
 - Think in components.
 - Keep components focused.
-- Lift state only when necessary.
-- Reuse logic through hooks.
 - Prefer composition.
+- Reuse logic through hooks.
+- Maintain predictable data flow.
 - Write declarative code.
-- Follow predictable data flow.
 
 ---
 
@@ -297,9 +285,9 @@ Avoid:
 
 React is a way of thinking about interfaces.
 
-By organizing applications into reusable components with predictable data flow, engineers can build software that remains scalable, maintainable, and easy to understand.
+By building applications with reusable components and predictable data flow, engineers create systems that remain scalable, maintainable, and easier to understand.
 
-Mastering React is less about memorizing APIs and more about adopting the correct mental model.
+Mastering React is not about memorizing APIs—it is about understanding the correct mental model.
 
 ---
 
