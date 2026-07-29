@@ -2,15 +2,15 @@
 
 > **Building Production-Ready Applications with Modern React**
 >
-> A framework for creating scalable, performant, and maintainable full-stack web applications using React, TypeScript, and modern web development principles.
+> A framework for creating scalable, performant, and maintainable full-stack applications using React, TypeScript, and modern web architecture.
 
 ---
 
 # Purpose
 
-This document defines the Next.js architecture, concepts, patterns, and engineering standards used throughout the SENSEI Handbook.
+This document defines the Next.js architecture, concepts, and engineering standards used throughout the SENSEI Handbook.
 
-Next.js is not treated as simply a React framework.
+Next.js is not treated as only a React framework.
 
 It is treated as an application architecture platform that provides solutions for:
 
@@ -20,54 +20,47 @@ It is treated as an application architecture platform that provides solutions fo
 - Performance optimization.
 - Backend integration.
 - Deployment.
-- Production scalability.
 
-The goal is not only to learn Next.js features.
+The goal is not memorizing features.
 
-The goal is to understand why each feature exists and when it should be used.
+The goal is understanding why each feature exists and when it should be used.
 
 ---
 
 # What Is Next.js?
 
-Next.js is a React framework designed for building production-grade web applications.
-
-It extends React by providing built-in solutions for common application requirements.
-
-Next.js provides:
-
-- File-based routing.
-- Server-side rendering.
-- Static generation.
-- Server Components.
-- API capabilities.
-- Image optimization.
-- Metadata management.
-- Deployment optimization.
+Next.js is a React framework designed for production applications.
 
 React provides the UI model.
 
-Next.js provides the application structure.
+Next.js provides application structure.
+
+It includes:
+
+- File-based routing.
+- Server Components.
+- Rendering strategies.
+- Data fetching patterns.
+- Image optimization.
+- Metadata management.
+- Deployment support.
 
 ---
 
 # Why Next.js Exists
 
-React solves the problem of building user interfaces.
+React solves UI creation.
 
-However, production applications require more than UI components.
-
-Applications also need:
+Production applications require more:
 
 - Routing.
-- Data management.
-- Performance optimization.
 - SEO.
+- Data handling.
 - Authentication integration.
+- Performance optimization.
 - Server communication.
-- Deployment strategies.
 
-Next.js provides these features in a consistent architecture.
+Next.js provides these capabilities through a consistent architecture.
 
 ---
 
@@ -75,13 +68,13 @@ Next.js provides these features in a consistent architecture.
 
 The most important concept:
 
-> **A Next.js application is a server-first application that can include interactive client experiences when needed.**
+> **Next.js is server-first, with client interaction added only when necessary.**
 
-Modern Next.js encourages engineers to think:
+Think:
 
 - Server by default.
-- Client only when necessary.
-- Data close to where it is used.
+- Client intentionally.
+- Data close to where it is needed.
 - Performance through architecture.
 
 ---
@@ -103,7 +96,7 @@ app/
     └── page.tsx
 ```
 
-The folder structure represents application routes.
+The file structure defines application routes.
 
 ---
 
@@ -117,54 +110,21 @@ Example:
 app/
 │
 ├── page.tsx
-│
 ├── about/
 │   └── page.tsx
-│
 └── dashboard/
     └── page.tsx
 ```
 
-Produces:
+Creates:
 
 ```text
 /
- /about
- /dashboard
+/about
+/dashboard
 ```
 
-Routing becomes predictable because the file system defines the application structure.
-
----
-
-# Layouts
-
-Layouts define shared UI around routes.
-
-Examples:
-
-- Navigation.
-- Sidebars.
-- Authentication wrappers.
-- Dashboard structures.
-
-Example:
-
-```tsx
-export default function DashboardLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
-    return (
-        <DashboardShell>
-            {children}
-        </DashboardShell>
-    )
-}
-```
-
-Layouts prevent repeating common structures.
+This makes application navigation predictable.
 
 ---
 
@@ -172,39 +132,40 @@ Layouts prevent repeating common structures.
 
 Server Components are the default in modern Next.js.
 
-They run on the server and do not ship unnecessary JavaScript to the browser.
+They run on the server and reduce unnecessary JavaScript sent to the browser.
 
 Benefits:
 
-- Better performance.
 - Smaller bundles.
+- Better performance.
 - Direct data access.
 - Improved scalability.
 
-Use Server Components whenever interaction is not required.
+Server Components can render Client Components when interaction is required.
+
+Use them whenever browser interaction is unnecessary.
 
 ---
 
 # Client Components
 
-Client Components are used when browser interaction is required.
+Client Components are used for browser-based behavior.
 
 Examples:
 
-- Click events.
 - State.
+- Events.
+- Forms.
 - Browser APIs.
-- Interactive forms.
+- Animations.
 
-They are marked using:
+They are marked with:
 
 ```tsx
 "use client";
 ```
 
-Use Client Components intentionally.
-
-Do not make everything a Client Component.
+Do not make every component a Client Component.
 
 ---
 
@@ -213,16 +174,15 @@ Do not make everything a Client Component.
 Use Server Components for:
 
 - Data fetching.
+- Authentication checks.
 - Static content.
 - Database access.
-- Authentication checks.
-- SEO content.
+- SEO pages.
 
 Use Client Components for:
 
-- User interactions.
+- User interaction.
 - Forms.
-- Animations.
 - Real-time UI.
 - Browser APIs.
 
@@ -230,7 +190,7 @@ Use Client Components for:
 
 # Data Fetching
 
-Next.js encourages fetching data close to where it is needed.
+Next.js encourages fetching data close to where it is used.
 
 Example:
 
@@ -251,11 +211,9 @@ Avoid unnecessary client-side fetching when server rendering is appropriate.
 
 # Rendering Strategies
 
-Next.js supports different rendering approaches.
-
 ## Static Rendering
 
-Content is generated ahead of time.
+Generated ahead of time.
 
 Best for:
 
@@ -267,19 +225,19 @@ Best for:
 
 ## Dynamic Rendering
 
-Content is generated per request.
+Generated per request.
 
 Best for:
 
-- Personalized dashboards.
-- User-specific pages.
+- Dashboards.
+- Personalized pages.
 - Private data.
 
 ---
 
 ## Streaming
 
-Allows parts of a page to load progressively.
+Loads parts of the application progressively.
 
 Benefits:
 
@@ -288,37 +246,21 @@ Benefits:
 
 ---
 
-# Loading States
+# Loading and Error Handling
 
-Every application should handle waiting states.
-
-Example:
-
-```text
-dashboard/
-│
-├── page.tsx
-└── loading.tsx
-```
-
-Loading states improve user experience.
-
----
-
-# Error Handling
-
-Next.js provides route-level error handling.
+Applications should handle failures and waiting states.
 
 Example:
 
 ```text
 dashboard/
-│
+
 ├── page.tsx
+├── loading.tsx
 └── error.tsx
 ```
 
-Applications should gracefully handle failures.
+Good applications provide feedback during every state.
 
 ---
 
@@ -345,7 +287,7 @@ Recommended structure:
 
 ```text
 src/
-│
+
 ├── app/
 ├── components/
 ├── features/
@@ -363,7 +305,7 @@ Architecture should remain feature-oriented and scalable.
 
 # Authentication Architecture
 
-Authentication should be handled through clear boundaries.
+Authentication should have clear boundaries.
 
 Example:
 
@@ -373,8 +315,6 @@ User
 Login Form
  ↓
 Auth Service
- ↓
-Authentication Provider
  ↓
 Session
  ↓
@@ -390,63 +330,42 @@ Related:
 
 ---
 
-# API Routes and Server Actions
-
-Next.js supports backend functionality.
-
-Use these carefully.
-
-Good use cases:
-
-- Form submissions.
-- Server mutations.
-- Secure operations.
-
-Avoid turning Next.js into an unstructured backend.
-
-Maintain clear boundaries.
-
----
-
 # Performance Principles
-
-Next.js performance depends on architecture.
 
 Important practices:
 
-- Use Server Components.
-- Optimize images.
+- Prefer Server Components.
 - Reduce client JavaScript.
-- Use caching properly.
-- Avoid unnecessary dependencies.
+- Optimize images.
+- Understand caching.
 - Split large features.
+- Avoid unnecessary dependencies.
 
-Performance is a design decision.
+Performance starts during architecture.
 
 ---
 
-# Common Next.js Mistakes
+# Common Mistakes
 
 Avoid:
 
-- Making every component client-side.
+- Making everything client-side.
 - Fetching everything in the browser.
-- Ignoring caching behavior.
+- Ignoring caching.
 - Mixing backend and frontend responsibilities.
-- Creating unnecessary API layers.
-- Ignoring loading and error states.
+- Ignoring loading states.
+- Creating unnecessary complexity.
 
 ---
 
 # Best Practices
 
-- Prefer Server Components.
-- Keep Client Components small.
-- Organize by features.
-- Use TypeScript strictly.
-- Document architectural decisions.
-- Design routes intentionally.
 - Understand rendering behavior.
+- Keep Client Components small.
+- Use TypeScript strictly.
+- Organize by features.
+- Design routes intentionally.
+- Document architectural decisions.
 
 ---
 
@@ -454,8 +373,8 @@ Avoid:
 
 Before completing a feature:
 
-- Is the component server or client intentionally?
-- Is data fetched from the correct location?
+- Is server/client usage intentional?
+- Is data fetched correctly?
 - Are loading states handled?
 - Are errors handled?
 - Is authentication secure?
@@ -466,13 +385,11 @@ Before completing a feature:
 
 # Summary
 
-Next.js provides a powerful foundation for building modern applications.
+Next.js is a tool for expressing good application architecture.
 
-However, the framework itself does not create good software.
+The framework does not automatically create good software.
 
-Good software comes from understanding architecture, choosing the right rendering strategy, separating responsibilities, and making thoughtful engineering decisions.
-
-Next.js should be used as a tool to express good architecture—not as a replacement for architectural thinking.
+Good engineering comes from understanding rendering, separating responsibilities, and making intentional architectural decisions.
 
 ---
 
