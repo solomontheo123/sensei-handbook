@@ -10,87 +10,83 @@
 
 This document defines the Axios standards, architecture, and usage patterns used throughout the SENSEI Handbook.
 
-Axios is not simply a tool for making API requests.
+Axios is not simply a request library.
 
-It is part of the application's communication architecture.
-
-A professional frontend application should have a predictable strategy for:
+It is part of the application's communication layer responsible for:
 
 - Sending requests.
 - Handling responses.
 - Managing errors.
-- Attaching authentication.
-- Logging failures.
-- Maintaining consistency.
+- Applying consistent configuration.
+- Connecting frontend systems with APIs.
 
 ---
 
 # What Is Axios?
 
-Axios is a promise-based HTTP client used for communicating with external services and backend APIs.
+Axios is a promise-based HTTP client used for communicating with backend APIs and external services.
 
-It provides a simpler and more powerful interface than the native Fetch API for many production applications.
-
-Axios supports:
+It provides features such as:
 
 - HTTP requests.
 - Request configuration.
 - Response handling.
 - Interceptors.
-- Automatic JSON handling.
+- JSON handling.
 - Error management.
 - Request cancellation.
+
+Axios focuses on communication.
+
+It does not replace state management or application architecture.
 
 ---
 
 # Why Axios Exists
 
-Frontend applications constantly communicate with external systems.
+Frontend applications communicate with many systems:
 
-Examples:
-
-- Authentication servers.
+- Authentication services.
 - Backend APIs.
 - Payment providers.
-- Third-party services.
+- External platforms.
 
 Without a structured communication layer, applications often develop:
 
 - Duplicate request logic.
-- Inconsistent error handling.
+- Inconsistent errors.
 - Repeated configuration.
 - Difficult debugging.
 
-Axios helps create a centralized API communication system.
+Axios helps create predictable API communication.
 
 ---
 
 # HTTP Communication Mental Model
 
-A frontend request follows this flow:
+A production request flow:
 
 ```text
-User Action
-      |
-      ↓
 Component
-      |
-      ↓
+
+↓
+
 Custom Hook
-      |
-      ↓
+
+↓
+
 Service Layer
-      |
-      ↓
+
+↓
+
 Axios Client
-      |
-      ↓
+
+↓
+
 Backend API
-      |
-      ↓
-Response
-      |
-      ↓
+
+↓
+
 UI Update
 ```
 
@@ -100,7 +96,7 @@ Components should not directly communicate with APIs.
 
 # Core Principle
 
-> **Components should describe user interfaces. Services should handle communication.**
+> **Components describe interfaces. Services handle communication.**
 
 Avoid:
 
@@ -112,18 +108,21 @@ function Login() {
 }
 ```
 
-Better:
+Prefer:
 
 ```text
 Login Component
-        |
-        ↓
+
+↓
+
 useLogin Hook
-        |
-        ↓
+
+↓
+
 authService.login()
-        |
-        ↓
+
+↓
+
 Axios Client
 ```
 
@@ -133,12 +132,13 @@ This keeps responsibilities separated.
 
 # Axios Architecture
 
-A production application should create a centralized Axios instance.
+Create a centralized Axios instance.
 
 Example:
 
 ```text
 lib/
+
 └── axios.ts
 ```
 
@@ -148,7 +148,7 @@ Responsibilities:
 - Default headers.
 - Authentication handling.
 - Error processing.
-- Request behavior.
+- Request configuration.
 
 ---
 
@@ -169,65 +169,46 @@ export const api = axios.create({
 
 Benefits:
 
-- One configuration source.
+- Single configuration source.
 - Easier maintenance.
 - Consistent requests.
 
 ---
 
-# Request Flow
+# Service Layer
 
-A typical request:
+API calls should not be scattered across components.
+
+Recommended:
 
 ```text
-Component
-    |
-    ↓
-Hook
-    |
-    ↓
-Service Function
-    |
-    ↓
-Axios Instance
-    |
-    ↓
-Backend Endpoint
+services/
+
+├── auth.service.ts
+├── user.service.ts
+├── project.service.ts
+└── payment.service.ts
 ```
 
 Example:
 
 ```ts
 export async function getUsers() {
+
     const response = await api.get("/users");
 
     return response.data;
+
 }
 ```
 
----
-
-# Response Handling
-
-Responses should be handled consistently.
-
-Example:
-
-```ts
-const response = await api.get("/profile");
-
-return response.data;
-```
-
-Avoid repeating response transformations throughout components.
+The service layer hides communication details from the UI.
 
 ---
 
 # Error Handling
 
-Errors are expected.
-
-A good application handles:
+Applications should handle:
 
 - Network failures.
 - Server errors.
@@ -249,20 +230,20 @@ try {
 }
 ```
 
-Error handling should provide useful feedback without exposing sensitive details.
+Errors should provide useful feedback without exposing sensitive information.
 
 ---
 
 # Axios Interceptors
 
-Interceptors allow logic to run before requests or responses.
+Interceptors run logic before requests or responses.
 
 Common uses:
 
-- Adding authentication headers.
+- Adding authentication information.
 - Logging requests.
-- Refreshing expired sessions.
 - Handling global errors.
+- Refreshing sessions.
 
 Example:
 
@@ -276,31 +257,35 @@ api.interceptors.request.use(
 );
 ```
 
+Interceptors should remain simple.
+
 ---
 
 # Authentication Integration
 
-Authenticated applications often need to attach session information.
+Axios can help attach authentication information.
 
-Typical flow:
+Flow:
 
 ```text
 User Login
-      |
-      ↓
+
+↓
+
 Session Created
-      |
-      ↓
+
+↓
+
 Request Sent
-      |
-      ↓
-Authentication Included
-      |
-      ↓
+
+↓
+
 Backend Validates User
 ```
 
-Authentication logic should remain centralized.
+Axios transports authentication information.
+
+The backend decides authorization.
 
 Related:
 
@@ -309,40 +294,7 @@ Related:
 
 ---
 
-# API Service Layer
-
-Do not place API calls throughout the application.
-
-Recommended structure:
-
-```text
-services/
-│
-├── auth.service.ts
-├── user.service.ts
-├── project.service.ts
-└── payment.service.ts
-```
-
-Example:
-
-```ts
-export const userService = {
-
-    getUsers() {
-        return api.get("/users");
-    },
-
-    getUser(id: string) {
-        return api.get(`/users/${id}`);
-    }
-
-};
-```
-
----
-
-# Axios With TanStack Query
+# Axios and TanStack Query
 
 Axios and TanStack Query solve different problems.
 
@@ -357,7 +309,7 @@ TanStack Query handles:
 - Synchronization.
 - Background updates.
 
-Typical architecture:
+Architecture:
 
 ```text
 Component
@@ -379,90 +331,61 @@ Axios
 Backend
 ```
 
-They work together rather than replacing each other.
-
 ---
 
-# Request States
+# Fetch vs Axios
 
-Every API request has states:
+Both can communicate with APIs.
 
-```text
-Idle
+Use cases depend on project needs.
 
-Loading
+`fetch()`:
 
-Success
+- Built into browsers and Next.js.
+- Works well with modern server components.
 
-Error
-```
+Axios:
 
-Applications should design for every state.
+- Provides centralized configuration.
+- Provides interceptors.
+- Offers consistent request handling.
 
-Users should never experience confusing blank screens.
-
----
-
-# Data Transformation
-
-API responses should be transformed at appropriate boundaries.
-
-Example:
-
-Backend response:
-
-```json
-{
-    "first_name": "John"
-}
-```
-
-Frontend model:
-
-```ts
-{
-    firstName: "John"
-}
-```
-
-Do transformations outside UI components.
+Choose based on architecture, not preference.
 
 ---
 
 # Security Considerations
 
-Frontend API communication should:
+Frontend communication should:
 
 - Never expose secrets.
-- Validate user input.
-- Handle authentication safely.
-- Avoid logging sensitive information.
+- Validate input.
 - Use HTTPS in production.
+- Avoid logging sensitive data.
+- Handle authentication safely.
 
 ---
 
-# Common Axios Mistakes
+# Common Mistakes
 
 Avoid:
 
-- Creating multiple Axios instances unnecessarily.
+- Creating unnecessary Axios instances.
 - Calling APIs directly inside components.
+- Hardcoding URLs.
 - Ignoring errors.
-- Hardcoding API URLs.
 - Duplicating request logic.
-- Storing sensitive information incorrectly.
+- Mixing UI and communication logic.
 
 ---
 
 # Best Practices
 
-Follow these principles:
-
-- Create one shared Axios client.
-- Centralize API communication.
-- Separate UI from data fetching.
+- Use a shared Axios client.
+- Separate services from components.
+- Define response types.
 - Handle errors consistently.
-- Use TypeScript types for responses.
+- Keep communication logic centralized.
 - Document important API behavior.
 
 ---
@@ -472,12 +395,12 @@ Follow these principles:
 Before completing API integration:
 
 - Is communication centralized?
-- Are services separated from components?
+- Are services separated from UI?
 - Are errors handled?
 - Are response types defined?
-- Is authentication handled securely?
+- Is authentication secure?
 - Are loading states considered?
-- Is unnecessary duplication removed?
+- Is duplication removed?
 
 ---
 
@@ -485,11 +408,9 @@ Before completing API integration:
 
 Axios is not just an HTTP library.
 
-It is part of the architecture that connects frontend applications to external systems.
+It is a communication boundary between frontend applications and external systems.
 
-When used correctly, Axios creates predictable communication patterns, cleaner components, easier debugging, and more maintainable applications.
-
-A strong API layer allows frontend engineers to build features faster without sacrificing quality.
+When used correctly, Axios creates predictable request patterns, cleaner components, easier debugging, and maintainable applications.
 
 ---
 
