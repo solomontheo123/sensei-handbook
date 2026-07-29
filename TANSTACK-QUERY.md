@@ -12,15 +12,15 @@ This document defines the TanStack Query architecture, principles, and engineeri
 
 TanStack Query is not simply a data-fetching library.
 
-It is a server-state management solution designed to handle the difficult problems that appear when frontend applications communicate with external data sources.
+It is a server-state management solution designed to solve the difficult problems created when frontend applications communicate with external data sources.
 
 This document explains:
 
 - What server state is.
-- Why traditional state management approaches fail.
-- How TanStack Query solves these problems.
+- How it differs from client state.
+- Why manual data management becomes difficult.
+- How TanStack Query creates predictable data synchronization.
 - How it integrates with Next.js, Axios, and application architecture.
-- Best practices for production applications.
 
 ---
 
@@ -33,10 +33,10 @@ It handles:
 - Fetching data.
 - Caching responses.
 - Synchronizing data.
-- Updating stale information.
 - Managing loading states.
 - Handling errors.
 - Performing mutations.
+- Updating stale information.
 
 Previously known as React Query, TanStack Query has evolved into a framework-independent data synchronization solution.
 
@@ -44,7 +44,7 @@ Previously known as React Query, TanStack Query has evolved into a framework-ind
 
 # Why TanStack Query Exists
 
-Modern applications constantly communicate with servers.
+Modern applications constantly communicate with external systems.
 
 Examples:
 
@@ -53,24 +53,23 @@ Examples:
 - Messages.
 - Notifications.
 - Products.
-- Dashboard analytics.
+- Analytics.
 
-Managing this data manually creates problems:
+Managing this manually creates problems:
 
 - Duplicate requests.
-- Complex loading states.
-- Manual caching.
+- Repeated loading logic.
 - Stale data.
+- Manual cache management.
 - Difficult synchronization.
-- Repeated error handling.
 
-TanStack Query solves these problems by managing server state automatically.
+TanStack Query solves these problems by managing the relationship between the frontend and server data.
 
 ---
 
 # Client State vs Server State
 
-One of the most important frontend architecture concepts is understanding the difference between client state and server state.
+Understanding this difference is one of the most important frontend architecture concepts.
 
 ---
 
@@ -82,16 +81,18 @@ Examples:
 
 - Modal visibility.
 - Theme selection.
-- Form inputs.
+- Form values.
 - Sidebar state.
 - UI preferences.
 
-Tools:
+Common tools:
 
-- React state.
+- React State.
 - Context API.
 - Zustand.
 - Redux.
+
+Client state represents application behavior.
 
 ---
 
@@ -109,9 +110,9 @@ Examples:
 Server state has unique challenges:
 
 - It can become outdated.
-- Multiple users can modify it.
-- Network requests can fail.
-- It must be synchronized.
+- Other users can modify it.
+- Requests can fail.
+- It requires synchronization.
 
 TanStack Query manages this category.
 
@@ -119,15 +120,15 @@ TanStack Query manages this category.
 
 # Core Mental Model
 
-The most important idea:
+The most important principle:
 
 > **The server is the source of truth.**
 
 The frontend does not permanently own server data.
 
-Instead, it creates a synchronized view of server information.
+Instead, it maintains a synchronized representation of server information.
 
-The relationship:
+Architecture:
 
 ```text
 Backend Database
@@ -153,11 +154,9 @@ User Interface
 
 # Core Features
 
-TanStack Query provides:
+## Queries
 
-## Query Management
-
-Fetching and caching server data.
+Queries retrieve and cache server data.
 
 Example:
 
@@ -172,31 +171,31 @@ const { data, isLoading } = useQuery({
 
 ## Automatic Caching
 
-Previously fetched data can be reused.
+TanStack Query stores previous results.
 
 Benefits:
 
 - Faster interfaces.
-- Reduced network requests.
+- Reduced unnecessary requests.
 - Better user experience.
 
 ---
 
 ## Background Refetching
 
-TanStack Query can automatically refresh stale data.
+TanStack Query can refresh stale data automatically.
 
 Examples:
 
-- When a user returns to a page.
-- After a period of inactivity.
-- After a mutation.
+- Returning to a page.
+- Reconnecting to the internet.
+- After mutations.
 
 ---
 
 ## Mutations
 
-Mutations handle data changes.
+Mutations handle changes to server data.
 
 Examples:
 
@@ -208,7 +207,7 @@ Example:
 
 ```tsx
 const mutation = useMutation({
-    mutationFn: createProject,
+    mutationFn:createProject,
 });
 ```
 
@@ -221,13 +220,13 @@ Query keys identify cached data.
 Example:
 
 ```tsx
-queryKey: ["users"]
+queryKey:["users"]
 ```
 
-For specific resources:
+Specific resource:
 
 ```tsx
-queryKey: ["user", userId]
+queryKey:["user", userId]
 ```
 
 Good query keys should be:
@@ -244,11 +243,11 @@ Recommended structure:
 
 ```text
 src/
-│
+
 ├── features/
-│   │
+
 │   └── users/
-│       │
+
 │       ├── hooks/
 │       │   └── useUsers.ts
 │       │
@@ -259,7 +258,7 @@ src/
 │           └── user.ts
 ```
 
-The flow:
+Flow:
 
 ```text
 Component
@@ -285,9 +284,9 @@ Backend API
 
 # Custom Query Hooks
 
-Avoid putting queries directly inside components.
+Avoid placing queries directly inside components.
 
-Instead:
+Prefer:
 
 ```tsx
 useUsers()
@@ -313,6 +312,7 @@ Benefits:
 - Reusable logic.
 - Cleaner components.
 - Easier testing.
+- Better separation of concerns.
 
 ---
 
@@ -332,7 +332,7 @@ Success
 Error
 ```
 
-Applications should design for every state.
+Every state should have a designed user experience.
 
 Example:
 
@@ -350,9 +350,9 @@ return <Users data={data}/>;
 
 ---
 
-# Mutations and Cache Updates
+# Cache Synchronization
 
-After changing data, the cache should remain synchronized.
+After modifying data, the cache must remain accurate.
 
 Example:
 
@@ -365,7 +365,7 @@ Backend Updated
 
 ↓
 
-Invalidate Projects Query
+Invalidate Query
 
 ↓
 
@@ -378,18 +378,16 @@ This prevents outdated interfaces.
 
 # Optimistic Updates
 
-Optimistic updates update the UI before the server confirms success.
+Optimistic updates update the interface before server confirmation.
 
 Example:
-
-User clicks "like":
 
 ```text
 User Action
 
 ↓
 
-UI Updates Immediately
+Immediate UI Update
 
 ↓
 
@@ -402,24 +400,25 @@ Confirm or Rollback
 
 Useful for fast interactions.
 
-Use carefully.
+Use carefully because failed requests require rollback handling.
 
 ---
 
 # Integration With Axios
 
-TanStack Query and Axios have different responsibilities.
+TanStack Query and Axios solve different problems.
 
-Axios:
+Axios handles:
 
-- Sends HTTP requests.
-- Handles communication.
+- HTTP communication.
+- Request configuration.
 
-TanStack Query:
+TanStack Query handles:
 
-- Manages server state.
-- Handles caching.
-- Synchronizes data.
+- Server state.
+- Caching.
+- Synchronization.
+- Background updates.
 
 Architecture:
 
@@ -440,14 +439,14 @@ Axios
 
 ↓
 
-API
+Backend API
 ```
 
 ---
 
 # Integration With Next.js
 
-In modern Next.js applications:
+TanStack Query works alongside Next.js.
 
 Use Server Components for:
 
@@ -458,10 +457,10 @@ Use Server Components for:
 Use TanStack Query for:
 
 - Interactive client data.
-- Frequently changing data.
+- Frequently changing information.
 - User-driven updates.
 
-They complement each other.
+They are complementary tools.
 
 ---
 
@@ -469,12 +468,12 @@ They complement each other.
 
 Avoid:
 
-- Using TanStack Query for local UI state.
-- Fetching data directly inside components.
-- Creating inconsistent query keys.
+- Using TanStack Query for UI state.
+- Calling APIs directly from components.
+- Poor query key design.
 - Ignoring cache invalidation.
-- Refetching unnecessarily.
-- Treating it as a replacement for APIs.
+- Refetching without reason.
+- Treating TanStack Query as a backend replacement.
 
 ---
 
@@ -484,11 +483,11 @@ Follow these principles:
 
 - Separate server state from client state.
 - Create reusable query hooks.
-- Keep API calls in service layers.
+- Keep API communication in service layers.
 - Use meaningful query keys.
 - Handle loading and error states.
 - Invalidate stale data correctly.
-- Measure before optimizing.
+- Optimize only after measurement.
 
 ---
 
@@ -498,7 +497,7 @@ Before adding a query:
 
 - Is this server state?
 - Is the query key meaningful?
-- Is the API call separated?
+- Is API communication separated?
 - Are loading states handled?
 - Are errors handled?
 - Is cache invalidation considered?
@@ -508,13 +507,13 @@ Before adding a query:
 
 # Summary
 
-TanStack Query changes the way frontend engineers think about data.
+TanStack Query changes how frontend engineers manage server data.
 
-Instead of manually controlling every request, cache, and synchronization problem, engineers define the relationship between the application and server data.
+Instead of manually controlling every request, cache, and synchronization process, engineers define a predictable relationship between the application and backend data.
 
 The goal is not to remove responsibility.
 
-The goal is to create a predictable architecture where server state is handled consistently and efficiently.
+The goal is to create a reliable architecture where server state is handled consistently and efficiently.
 
 ---
 
